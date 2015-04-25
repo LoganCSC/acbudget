@@ -152,7 +152,7 @@ var budget = (function (module) {
 
             // ENTER + UPDATE
             legendEntry.select('.swatch')
-                .style('background', model.getColorForValue);
+                .style('background-color', model.getColorForValue);
             legendEntry.select('.labelText')
                 .text(function(d) {return shortenText(d, 26); });
 
@@ -217,6 +217,7 @@ var budget = (function (module) {
                 .attr('r', 0)
                 .remove();
 
+            console.log("start");
             force.start();
         };
 

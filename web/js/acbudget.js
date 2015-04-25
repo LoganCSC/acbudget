@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    d3.csv("data/budget_data.csv", function (data) {
+    d3.csv("data/fake_budget_data.csv", function (data) {
         var model = new budget.Model(data);
         create(model);
     });
