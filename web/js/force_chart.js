@@ -15,6 +15,8 @@ var budget = (function (module) {
             viewMode : "cluster"  // "cluster" or "plot"
         };
 
+        var width;
+        var height;
         var chart;
         var svg;
         var force;
@@ -23,14 +25,15 @@ var budget = (function (module) {
         var tickChangeFormat = d3.format("+%");
 
         // Dictionary and descriptions written by Joel Brinck Kohn
+        // This is for demo purposes to show tooltips. In the finaly system, these should be in the csv data.
         var nameDict = {};
             nameDict["Intra-Fund Transfer"] = "Intra-Fund Transfers refer to money exchanged between two different agencies of the county.";
             nameDict["Fixed Assets"] = "Fixed assets are items and property like land, buildings, and equipment that the county cannot easily convert to cash worth more than $5000.";
             nameDict["Salaries & Employee Benefits"] = "Salaries and Employee benefits wages of county employees as well as benefits like health insurance";
             nameDict["Discretionary Services & Supplies"] = "Discretionary Services & Supplies";
             nameDict["Non-Discretionary Services & Supplies"] = "Non-Discretionary Services & Supplies ";
-            nameDict["Reserve/Desg"] = "Reserves Desginations are funds that were not spent in previous years that intended to handle unknown expenses";
-            nameDict["Contigency"] = "Contignecies are funds set aside for projects in the even that unforseen expenses arise";
+            nameDict["Reserve/Desg"] = "Reserves Designations are funds that were not spent in previous years that intended to handle unknown expenses";
+            nameDict["Contingency"] = "Contingencies are funds set aside for projects in the even that unforeseen expenses arise";
 
 
         /**
@@ -86,7 +89,7 @@ var budget = (function (module) {
                 .style("fill", '#aaa')
                 .style("font-size", "14px");
             labels
-                .append("title")  // appending here does not seem right.
+                .append("title")
                 .text(function(d) {
                     if (nameDict[d.name]) {
                         return nameDict[d.name];
@@ -119,12 +122,20 @@ var budget = (function (module) {
 
             // ENTER + UPDATE
             verticalText
+                .text(function(d) {return d;})
                 .transition().duration(1000)
                 .attr("transform", function(d) {
                     return " translate(" + (xOffset + plotXScale(d)) + ",70)rotate(90)";
                 })
-                .style("font-size", fontSize)
-                .text(function(d) {return d;});
+                .style("font-size", fontSize);
+            verticalText
+                .append("title")
+                .text(function(d) {
+                    if (nameDict[d]) {
+                        return nameDict[d];
+                    }
+                    return d;
+                });
 
             // EXIT
             verticalText.exit()
@@ -133,7 +144,6 @@ var budget = (function (module) {
                 .style("font-size", 0)
                 .remove();
         };
-
 
         my.setSizeAttribute = function(sizeVal) {
             model.sizeAttr = sizeVal;
