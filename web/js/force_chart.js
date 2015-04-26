@@ -89,7 +89,7 @@ var budget = (function (module) {
                 .append("title")  // appending here does not seem right.
                 .text(function(d) {
                     if (nameDict[d.name]) {
-                        return d.name;
+                        return nameDict[d.name];
                     }
                     return d.name;
                 });
