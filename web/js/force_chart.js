@@ -191,10 +191,8 @@ var budget = (function (module) {
 
         my.renderAsClusters = function(circles) {
             var centers = model.getCenters();
-            // .friction(0) freezes
-            // .theta(0.8)
-            // .alpha(0.1)  cooling parameter
-            force = d3.layout.force(); //.gravity(1.0).friction(0.2).alpha(0.4);
+
+            force = d3.layout.force(); //.gravity(1.0).friction(0.2).theta(0.8).alpha(0.4);
 
             force.on("tick", tick(centers, model.group, circles));
 
@@ -207,14 +205,12 @@ var budget = (function (module) {
                 .append("circle")
                 .attr("class", "node")
                 .attr("cx", function (d) {
-                    return Math.random() * model.width;
-                    //return d.x;
+                    return d.x;
                 })
                 .attr("cy", function (d) {
-                    return Math.random() * model.height;
-                    //return d.y;
+                    return d.y;
                 })
-                .attr("r", function (d) {return d.radius;})
+                .attr("r", function (d) {return 0; })//d.radius;})
                 .style("fill", model.getColor)
                 .on("mouseover", function (d) {
                     showPopover.call(this, d);
@@ -226,12 +222,13 @@ var budget = (function (module) {
             // UPDATE
             circles
                 .transition().duration(1000)
-                .attr('r', function(d) {
-                    return model.sizeAttr ? d.radius : budget.DEFAULT_RADIUS;
-                })
                 .attr('cx', function(d) { return d.x })
                 .attr('cy', function(d) { return d.y })
-                .style('fill', model.getColor);
+                .style('fill', model.getColor)
+                .transition().duration(500)
+                .attr('r', function(d) {
+                    return model.sizeAttr ? d.radius : budget.DEFAULT_RADIUS;
+                });
 
             // EXIT
             circles.exit()
@@ -239,8 +236,11 @@ var budget = (function (module) {
                 .attr('r', 0)
                 .remove();
 
-            console.log("start");
-            force.start();
+            setTimeout(function() {
+                console.log("start");
+                force.start();
+            }, 1500);
+
         };
 
         my.renderAsPlot = function(circles) {
