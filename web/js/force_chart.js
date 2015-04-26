@@ -15,8 +15,6 @@ var budget = (function (module) {
             viewMode : "cluster"  // "cluster" or "plot"
         };
 
-        var width;
-        var height;
         var chart;
         var svg;
         var force;
@@ -45,9 +43,8 @@ var budget = (function (module) {
             svg = d3.select(div).append("svg");
         }
 
-        my.setSize = function(w, h) {
-            width = w; //Math.max(chart.width(), 100);
-            height = h; //Math.max(chart.height(), 100);
+        my.setSize = function(width, height) {
+
             model.setSize(width, height);
             svg.attr("width", width)
                 .attr("height", height);
@@ -55,9 +52,6 @@ var budget = (function (module) {
         };
 
         my.setGroup = function(group) {
-            //if (group != model.group) {
-            //    model.randomizePositions();
-            //}
             model.group = group;
         };
 
@@ -72,20 +66,18 @@ var budget = (function (module) {
 
             labels.enter()
                 .append("text")
-                .attr("transform", position)
+                //.attr("transform", position)
                 .attr("class", "group-label")
                 .style("font-size", 0)
                 .style("fill", '#ffffff');
-                //.append("title")
-                //.text(function(d) {return d.name;});
 
             // ENTER + UPDATE
             labels
                 .text(function (d) {
                     return shortenText(d.name, maxLen);
                 })
-                .attr("transform", position)
                 .transition().duration(1000)
+                .attr("transform", position)
                 .style("fill", '#aaa')
                 .style("font-size", "14px");
             labels
@@ -123,10 +115,10 @@ var budget = (function (module) {
             // ENTER + UPDATE
             verticalText
                 .text(function(d) {return d;})
-                .transition().duration(1000)
                 .attr("transform", function(d) {
                     return " translate(" + (xOffset + plotXScale(d)) + ",70)rotate(90)";
                 })
+                .transition().duration(1000)
                 .style("font-size", fontSize);
             verticalText
                 .append("title")
@@ -193,8 +185,14 @@ var budget = (function (module) {
             circles.enter()
                 .append("circle")
                 .attr("class", "node")
-                .attr("cx", function (d) {return d.x;})
-                .attr("cy", function (d) {return d.y;})
+                .attr("cx", function (d) {
+                    return Math.random() * model.width;
+                    //return d.x;
+                })
+                .attr("cy", function (d) {
+                    return Math.random() * model.height;
+                    //return d.y;
+                })
                 .attr("r", function (d) {return d.radius;})
                 .style("fill", model.getColor)
                 .on("mouseover", function (d) {
@@ -217,7 +215,7 @@ var budget = (function (module) {
             // .friction(0) freezes
             // .theta(0.8)
             // .alpha(0.1)  cooling parameter
-            force = d3.layout.force().alpha(0.4); //.gravity(1.0).friction(0.2).alpha(0.4);
+            force = d3.layout.force(); //.gravity(1.0).friction(0.2).alpha(0.4);
 
             force.on("tick", tick(centers, model.group, circles));
 
@@ -255,22 +253,23 @@ var budget = (function (module) {
             addChangePlotGrid(model.changeTickValues);
 
             var groupValues = model.getGroupValues();
-            plotXScale.domain(groupValues).rangePoints([40, model.width-10], 1);
+            plotXScale.domain(groupValues).rangePoints([40, model.width - 10], 1);
             drawClusterGroupLabels([]);
             drawPlotGroupLabels(groupValues);
 
             // UPDATE
             circles
                 .transition().duration(2000)
-                .attr('r', function(d) {
-                    return model.sizeAttr ? d.radius : budget.DEFAULT_RADIUS;
-                })
                 .attr('cx', function(d) {
                     return plotXScale(d[model.group]);
                 })
                 .attr('cy', function(d) {
                     return changeScale(d.approvedPercentChange);
                 })
+                .attr('r', function(d) {
+                    return model.sizeAttr ? d.radius : budget.DEFAULT_RADIUS;
+                })
+
                 .style('fill', model.getColor);
 
             // EXIT
@@ -308,8 +307,9 @@ var budget = (function (module) {
         };
 
         var addChangePlotGrid = function(tickValues) {
-            changeScale.range([height - 20, 50]);
+            changeScale.range([model.height - 20, 50]);
             var gridLines = d3.select("#changeOverlay").selectAll("div").data(tickValues);
+            var width = model.width;
 
             // ENTER
             gridLines.enter()
@@ -320,7 +320,9 @@ var budget = (function (module) {
             // ENTER + UPDATE
             gridLines
                 .style("top", function(d) {return changeScale(d) + 'px';})
-                .style("width", function(d) { return ((d === 0) ? (width - 30) : (width - 90)) + "px"; })
+                .style("width", function(d) {
+                    return ((d === 0) ? (width - 30) : (width - 90)) + "px";
+                })
                 .classed('changeZeroTick', function(d) { return d === 0;});
 
             // EXIT
