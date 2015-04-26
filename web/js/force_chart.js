@@ -181,27 +181,6 @@ var budget = (function (module) {
             model.processData();
             var circles = svg.selectAll("circle").data(model.filteredData, model.keyFunc);
 
-            // ENTER
-            circles.enter()
-                .append("circle")
-                .attr("class", "node")
-                .attr("cx", function (d) {
-                    return Math.random() * model.width;
-                    //return d.x;
-                })
-                .attr("cy", function (d) {
-                    return Math.random() * model.height;
-                    //return d.y;
-                })
-                .attr("r", function (d) {return d.radius;})
-                .style("fill", model.getColor)
-                .on("mouseover", function (d) {
-                    showPopover.call(this, d);
-                })
-                .on("mouseout", function (d) {
-                    removePopovers();
-                });
-
             if (my.viewMode == "cluster") {
                 my.renderAsClusters(circles);
             }
@@ -222,6 +201,27 @@ var budget = (function (module) {
             drawClusterGroupLabels(centers);
             drawPlotGroupLabels([]);
             addChangePlotGrid([]);
+
+            // ENTER
+            circles.enter()
+                .append("circle")
+                .attr("class", "node")
+                .attr("cx", function (d) {
+                    return Math.random() * model.width;
+                    //return d.x;
+                })
+                .attr("cy", function (d) {
+                    return Math.random() * model.height;
+                    //return d.y;
+                })
+                .attr("r", function (d) {return d.radius;})
+                .style("fill", model.getColor)
+                .on("mouseover", function (d) {
+                    showPopover.call(this, d);
+                })
+                .on("mouseout", function (d) {
+                    removePopovers();
+                });
 
             // UPDATE
             circles
@@ -256,6 +256,25 @@ var budget = (function (module) {
             plotXScale.domain(groupValues).rangePoints([40, model.width - 10], 1);
             drawClusterGroupLabels([]);
             drawPlotGroupLabels(groupValues);
+
+            // ENTER
+            circles.enter()
+                .append("circle")
+                .attr("class", "node")
+                .attr('cx', function(d) {
+                    return plotXScale(d[model.group]);
+                })
+                .attr('cy', function(d) {
+                    return changeScale(d.approvedPercentChange);
+                })
+                .attr("r", function (d) {return 0;})
+                .style("fill", model.getColor)
+                .on("mouseover", function (d) {
+                    showPopover.call(this, d);
+                })
+                .on("mouseout", function (d) {
+                    removePopovers();
+                });
 
             // UPDATE
             circles
