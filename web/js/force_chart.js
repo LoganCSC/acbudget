@@ -24,13 +24,13 @@ var budget = (function (module) {
 
         // Dictionary and descriptions written by Joel Brinck Kohn
         var nameDict = {};
-            nameDict["Intra-Fund Transfer"] = "Intra-Fund Transfers refer to money from one agency given to another.";
+            nameDict["Intra-Fund Transfer"] = "Intra-Fund Transfers refer to money exchanged between two different agencies of the county.";
             nameDict["Fixed Assets"] = "Fixed assets are items and property like land, buildings, and equipment that the county cannot easily convert to cash worth more than $5000.";
             nameDict["Salaries & Employee Benefits"] = "Salaries and Employee benefits wages of county employees as well as benefits like health insurance";
-            nameDict["Discretionary Services & Supplies"] = "Discretionary Services & Supplies are expenses for services and items that an agency is not legally required to buy";
-            nameDict["Non-Discretionary Services & Supplies"] = "Non-Discretionary Services & Supplies are expenses for services and items that an agency is legally required to buy";
+            nameDict["Discretionary Services & Supplies"] = "Discretionary Services & Supplies";
+            nameDict["Non-Discretionary Services & Supplies"] = "Non-Discretionary Services & Supplies ";
             nameDict["Reserve/Desg"] = "Reserves Desginations are funds that were not spent in previous years that intended to handle unknown expenses";
-            nameDict["Contigency"] = "Contignecies are funds set aside for projects in the even that enexpected costs appear";
+            nameDict["Contigency"] = "Contignecies are funds set aside for projects in the even that unforseen expenses arise";
 
 
         /**
@@ -89,7 +89,7 @@ var budget = (function (module) {
                 .append("title")  // appending here does not seem right.
                 .text(function(d) {
                     if (nameDict[d.name]) {
-                        return d.name;
+                        return nameDict[d.name];
                     }
                     return d.name;
                 });
