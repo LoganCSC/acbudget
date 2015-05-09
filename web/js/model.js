@@ -89,36 +89,40 @@ var budget = (function (module) {
             my.processData()
         }
 
-        /** add more properties to original data */
+        /**
+         * add more properties to original data.
+         * When done, filtredNodes and filteredArcs are accessible
+         */
         my.processData = function() {
             var data = my.data;
-            var filteredData = [];
+            var filteredNodes = [];
+            var filteredArcs = [];
 
             for (var j = 0; j < data.length; j++) {
                 var d = data[j];
                 if (d['Fiscal Year'] == my.filters['Fiscal Year']) {
-                    filteredData.push(d);
+                    filteredNodes.push(d);
                 }
             }
 
-            filteredData.maximums = getMaximums(filteredData);
+            filteredNodes.maximums = getMaximums(filteredNodes);
             if (my.sizeAttr) {
-                var rmax = filteredData.maximums[my.sizeAttr];
-                for (var k = 0; k < filteredData.length; k++) {
-                    filteredData[k].radius = (my.sizeAttr != '') ?
-                            RADIUS_SCALE * (Math.cbrt(filteredData[k][my.sizeAttr]) / rmax) :
+                var rmax = filteredNodes.maximums[my.sizeAttr];
+                for (var k = 0; k < filteredNodes.length; k++) {
+                    filteredNodes[k].radius = (my.sizeAttr != '') ?
+                            RADIUS_SCALE * (Math.cbrt(filteredNodes[k][my.sizeAttr]) / rmax) :
                             budget.DEFAULT_RADIUS;
                 }
-                filteredData.maximums.radius = d3.max(_.pluck(filteredData, "radius"));
+                filteredNodes.maximums.radius = d3.max(_.pluck(filteredNodes, "radius"));
             }
 
-            my.filteredData = filteredData;
-            return filteredData;
+            my.filteredNodes = filteredNodes;
+            my.filteredArcs = filteredArcs;
         };
 
         /** returns the grand total of approved amounts for the current filtered set of records */
         my.getTotal = function() {
-            return d3.sum(my.filteredData, function(d) {return d["Recommended Amount"]});
+            return d3.sum(my.filteredNodes, function(d) {return d["Recommended Amount"]});
         };
 
         my.setSize = function(width, height) {

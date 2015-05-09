@@ -179,7 +179,7 @@ var budget = (function (module) {
         /** the nodes get placed in clusters or in a plot formation */
         my.render = function() {
             model.processData();
-            var nodes = svg.selectAll("circle").data(model.filteredData, model.keyFunc);
+            var nodes = svg.selectAll("circle").data(model.filteredNodes, model.keyFunc);
 
             if (my.viewMode == "cluster") {
                 my.renderAsClusters(nodes);
@@ -358,8 +358,8 @@ var budget = (function (module) {
                 focis[centers[i].name] = centers[i];
             }
             return function (e) {
-                for (var i = 0; i < model.filteredData.length; i++) {
-                    var item = model.filteredData[i];
+                for (var i = 0; i < model.filteredNodes.length; i++) {
+                    var item = model.filteredNodes[i];
                     var foci = focis[item[group]];
                     item.y += ((foci.y + (foci.dy / 2)) - item.y) * e.alpha;
                     item.x += ((foci.x + (foci.dx / 2)) - item.x) * e.alpha;
@@ -379,11 +379,11 @@ var budget = (function (module) {
          * @returns {Function}
          */
         var collide = function(alpha) {
-            var quadtree = d3.geom.quadtree(model.filteredData);
+            var quadtree = d3.geom.quadtree(model.filteredNodes);
             return function (d) {
                 var padding = 5;
                 var rad = Math.abs(d.radius);
-                var r = rad + model.filteredData.maximums["radius"] + padding,
+                var r = rad + model.filteredNodes.maximums["radius"] + padding,
                     nx1 = d.x - r,
                     nx2 = d.x + r,
                     ny1 = d.y - r,
