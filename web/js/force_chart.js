@@ -210,7 +210,7 @@ var budget = (function (module) {
                 .attr("cy", function (d) {
                     return d.y;
                 })
-                .attr("r", function (d) {return 0; })//d.radius;})
+                .attr("r", function (d) {return 0; })
                 .style("fill", model.getColor)
                 .on("mouseover", function (d) {
                     showPopover.call(this, d);
@@ -227,7 +227,7 @@ var budget = (function (module) {
                 .style('fill', model.getColor)
                 .transition().duration(500)
                 .attr('r', function(d) {
-                    return model.sizeAttr ? d.radius : budget.DEFAULT_RADIUS;
+                    return model.sizeAttr ? Math.abs(d.radius) : budget.DEFAULT_RADIUS;
                 });
 
             // EXIT
@@ -286,7 +286,7 @@ var budget = (function (module) {
                     return changeScale(d.approvedPercentChange);
                 })
                 .attr('r', function(d) {
-                    return model.sizeAttr ? d.radius : budget.DEFAULT_RADIUS;
+                    return model.sizeAttr ? Math.abs(d.radius) : budget.DEFAULT_RADIUS;
                 })
 
                 .style('fill', model.getColor);
@@ -382,7 +382,8 @@ var budget = (function (module) {
             var quadtree = d3.geom.quadtree(model.filteredData);
             return function (d) {
                 var padding = 5;
-                var r = d.radius + model.filteredData.maximums["radius"] + padding,
+                var rad = Math.abs(d.radius);
+                var r = rad + model.filteredData.maximums["radius"] + padding,
                     nx1 = d.x - r,
                     nx2 = d.x + r,
                     ny1 = d.y - r,
@@ -392,7 +393,7 @@ var budget = (function (module) {
                         var x = d.x - quad.point.x,
                             y = d.y - quad.point.y,
                             l = Math.sqrt(x * x + y * y),
-                            r = d.radius + quad.point.radius + padding;
+                            r = rad + Math.abs(quad.point.radius) + padding;
                         if (l < r) {
                             l = (l - r) / l * alpha;
                             d.x -= x *= l;

@@ -8,6 +8,9 @@ var budget = (function (module) {
         var RADIUS_SCALE = 30;
         var NUMBER_FORMAT = d3.format(",.0f");
         var DEFAULT_COLOR = "#a58fff";
+        /** from colored bubble to transfer colored bubble for intra-fund transfer. */
+        var TRANSFER_COLOR = "#fff";
+
         // the tooltip dimensions to show in order
         var TIP_DIMENSIONS = ['Program Area', 'Major Object', 'Expense Category', 'Department', 'Account Name', 'Budget Unit'];
         var changeCategories = ["< Less than -50%", "-50% to -10%", "-10% to -1%", "No Change", "1% to 10%", "10% to 50%", "50% or greater"];
@@ -32,17 +35,12 @@ var budget = (function (module) {
                 "#9caf84",
                 "#5aa33c" // original was #7aa25c"
             ]);
-        //var changeStrokeColor = d3.scale.ordinal()
-        //    .domain([-3, -2, -1, 0, 1, 2, 3])
-        //    .range(["#c72d0a", "#e67761","#d9a097","#999","#a7bb8f", "#7e965d", "#5a8731"]);
-        var tickChangeFormat = d3.format("+%");
-
 
         // holds public methods and data
         var my = {
             width: 900,
             height: 600,
-            filters: {"Fiscal Year":"2015", "type":"Expenditure"},
+            filters: {"Fiscal Year":"2015"},
             changeTickValues: [-0.5, -0.25, -0.15, -0.05, 0, 0.05, 0.15, 0.25, 0.5],
             group : '',
             sizeAttr : '',
@@ -60,9 +58,9 @@ var budget = (function (module) {
                 d.x = Math.random() * my.width;
                 d.y = Math.random() * my.height;
                 var approvedAmt = +d["Approved Amount"];
-                d.type = approvedAmt > 0 ? "Expenditure" : "Revenue";
-                d["Approved Amount"] = Math.abs(+d["Approved Amount"]);
-                d["Recommended Amount"] = Math.abs(+d["Recommended Amount"]);
+                d.type = approvedAmt > 0 ? "source" : "destination";
+                d["Approved Amount"] = +d["Approved Amount"];
+                d["Recommended Amount"] = +d["Recommended Amount"];
                 d.approvedToRecommendedRatio = d["Approved Amount"] / d["Recommended Amount"];
             }
             for (j = 0; j < data.length; j++) {
@@ -98,7 +96,7 @@ var budget = (function (module) {
 
             for (var j = 0; j < data.length; j++) {
                 var d = data[j];
-                if (d['type'] == my.filters['type'] && d['Fiscal Year'] == my.filters['Fiscal Year']) {
+                if (d['Fiscal Year'] == my.filters['Fiscal Year']) {
                     filteredData.push(d);
                 }
             }
@@ -150,7 +148,7 @@ var budget = (function (module) {
                 return changeFillColor(row[my.colorAttr]);
             }
             else {
-                return my.colorAttr ? my.getColors()(row[my.colorAttr]) : DEFAULT_COLOR;
+                return my.colorAttr ? (row.type == "destination" ? TRANSFER_COLOR : my.getColors()(row[my.colorAttr])) : DEFAULT_COLOR;
             }
         };
 
@@ -221,7 +219,7 @@ var budget = (function (module) {
         };
 
         my.serialize = function(d) {
-            var tip = "<div class='tip-header'><b>" + d['Fiscal Year'] + " " + d.type + "</b></div>";
+            var tip = "<div class='tip-header'><b>" + d['Fiscal Year'] + "</b></div>";
             _.each(TIP_DIMENSIONS, function(dimension) {
                 if (dimension == my.group) {
                     tip += "<span class='selected-tip-dimension'><b>" + dimension + ": </b>" + d[dimension] + "</span><br/>";

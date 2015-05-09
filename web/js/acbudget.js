@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    d3.csv("data/fake_budget_data.csv", function (data) {
+    d3.csv("data/budget_data.csv", function (data) {
         var model = new budget.Model(data);
         create(model);
     });
@@ -10,10 +10,12 @@ var currentYear;
 /**
  * create the chart based on the data
  * TODO:
- *   - fix bugs around cluster layout
+ *   - negatives are not revenues. They are mostly intra-fund transfers between departments.
+ *     A link should be drawn from the positive bubble to a point representing
+ *     where it will go (the negative counterpart). They cancel.
+ *      - determine links
+ *      - render links
  *   - if the bubble size is big, add a label
- *   - prepare for 3 min demo
- *   - only colors for unique values in filtered data
  *
  * @param model the budget datamodel.
  */
@@ -83,23 +85,18 @@ function create(model) {
     }
 
     function doFilter() {
-        var isExpenditure = $("#expenditure").is(":checked");
         var year = getYear();
-        var type = isExpenditure ? "Expenditure" : "Revenue";
-
-        model.setFilter({"Fiscal Year":year, "type":type});
-
-        updateTitle(year, isExpenditure)
+        model.setFilter({"Fiscal Year":year});
+        updateTitle(year)
     }
 
     /**
      * make sure that the title reflects year, type, and totals based on selections
      * Add a little glow effect so its apparent what changed.
      */
-    function updateTitle(year, isExpenditure) {
+    function updateTitle(year) {
 
         var total = "$" + model.getTotal().toLocaleString();
-        var totalSuffix = " in " + (isExpenditure ? "expenditures" : "revenues");
 
         var newYear = getYear();
         if (newYear != currentYear) {
@@ -107,8 +104,9 @@ function create(model) {
             currentYear = newYear;
         }
 
-        $("#budget-total").attr("class", isExpenditure ? "expenditure-style" : "revenue-style").text(total);
-        $("#budget-type").text(totalSuffix);
+        $("#budget-total")
+            .attr("class", "expenditure-style")
+            .text(total);
 
         setTimeout(function(){
             $("#current-year").removeClass('glow');
