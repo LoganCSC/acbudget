@@ -85,21 +85,21 @@ var budget = (function (module) {
                 }
             }
             my.colors = computeColors(data);
-            my.data = data;
-            my.processData()
+            my.nodes = data;
+            my.processData();
         }
 
         /**
          * add more properties to original data.
-         * When done, filtredNodes and filteredArcs are accessible
+         * When done, filteredNodes and filteredArcs are accessible
          */
         my.processData = function() {
-            var data = my.data;
+            var nodes = my.nodes;
             var filteredNodes = [];
             var filteredArcs = [];
 
-            for (var j = 0; j < data.length; j++) {
-                var d = data[j];
+            for (var j = 0; j < nodes.length; j++) {
+                var d = nodes[j];
                 if (d['Fiscal Year'] == my.filters['Fiscal Year']) {
                     filteredNodes.push(d);
                 }
@@ -128,11 +128,11 @@ var budget = (function (module) {
         my.setSize = function(width, height) {
             my.width = width;
             my.height = height;
-            var data = my.data;
+            var nodes = my.nodes;
         };
 
         my.randomizePositions = function() {
-            _.each(my.data, function(row) {
+            _.each(my.nodes, function(row) {
                 row.x = Math.random() * my.width;
                 row.y = Math.random() *  my.height;
             });
@@ -164,17 +164,17 @@ var budget = (function (module) {
             return my.colorAttr ? my.getColors()(val) : DEFAULT_COLOR;
         };
 
-        /** get maximum values for continuous variables. This could be a property of the data */
-        var getMaximums = function(data) {
-            var getMax = function(data, variable) {
-                return Math.cbrt(d3.max(_.pluck(data, variable)));
+        /** get maximum values for continuous variables. This could be a property of the nodes */
+        var getMaximums = function(nodes) {
+            var getMax = function(nodes, variable) {
+                return Math.cbrt(d3.max(_.pluck(nodes, variable)));
             };
             return {
-                'Approved Amount': getMax(data, 'Approved Amount'),
-                'Recommended Amount': getMax(data, 'Recommended Amount'),
-                'approvedToRecommendedRatio': getMax(data, 'approvedToRecommendedRatio'),
-                'approvedPercentChange': getMax(data, 'approvedPercentChange'),
-                'recommendedPercentChange': getMax(data, 'recommendedPercentChange')
+                'Approved Amount': getMax(nodes, 'Approved Amount'),
+                'Recommended Amount': getMax(nodes, 'Recommended Amount'),
+                'approvedToRecommendedRatio': getMax(nodes, 'approvedToRecommendedRatio'),
+                'approvedPercentChange': getMax(nodes, 'approvedPercentChange'),
+                'recommendedPercentChange': getMax(nodes, 'recommendedPercentChange')
             };
         };
 
@@ -192,16 +192,16 @@ var budget = (function (module) {
         };
 
         my.getGroupValues = function() {
-            return _.uniq(_.pluck(my.data, my.group));
+            return _.uniq(_.pluck(my.nodes, my.group));
         };
 
-        var computeColors = function(data) {
+        var computeColors = function(nodes) {
             var colors = {};
             var categoricColumns = ["Fiscal Year", "Program Area", "Department",
                 "Budget Unit", "Major Object", "Expense Category", "Account Name"
             ];
             _.each(categoricColumns, function(col) {
-                colors[col] = d3.scale.category20().domain(data.map( function (d) { return d[col]; }));
+                colors[col] = d3.scale.category20().domain(nodes.map( function (d) { return d[col]; }));
             });
             colors["recommendedPercentChangeBin"] = changeFillColor;
             colors["approvedPercentChangeBin"] = changeFillColor;
