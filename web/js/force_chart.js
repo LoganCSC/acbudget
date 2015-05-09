@@ -23,7 +23,7 @@ var budget = (function (module) {
         var tickChangeFormat = d3.format("+%");
 
         // Dictionary and descriptions written by Joel Brinck Kohn
-        // This is for demo purposes to show tooltips. In the finaly system, these should be in the csv data.
+        // This is for demo purposes to show tooltips. In the finally system, these should be in the csv data.
         var nameDict = {};
             nameDict["Intra-Fund Transfer"] = "Intra-Fund Transfers refer to money exchanged between two different agencies of the county.";
             nameDict["Fixed Assets"] = "Fixed assets are items and property like land, buildings, and equipment that the county cannot easily convert to cash worth more than $5000.";
@@ -176,32 +176,32 @@ var budget = (function (module) {
             legendEntry.exit().remove();
         };
 
-        /** the circles get placed in clusters or in a plot formation */
+        /** the nodes get placed in clusters or in a plot formation */
         my.render = function() {
             model.processData();
-            var circles = svg.selectAll("circle").data(model.filteredData, model.keyFunc);
+            var nodes = svg.selectAll("circle").data(model.filteredData, model.keyFunc);
 
             if (my.viewMode == "cluster") {
-                my.renderAsClusters(circles);
+                my.renderAsClusters(nodes);
             }
             else {
-                my.renderAsPlot(circles);
+                my.renderAsPlot(nodes);
             }
         };
 
-        my.renderAsClusters = function(circles) {
+        my.renderAsClusters = function(nodes) {
             var centers = model.getCenters();
 
             force = d3.layout.force(); //.gravity(1.0).friction(0.2).theta(0.8).alpha(0.4);
 
-            force.on("tick", tick(centers, model.group, circles));
+            force.on("tick", tick(centers, model.group, nodes));
 
             drawClusterGroupLabels(centers);
             drawPlotGroupLabels([]);
             addChangePlotGrid([]);
 
             // ENTER
-            circles.enter()
+            nodes.enter()
                 .append("circle")
                 .attr("class", "node")
                 .attr("cx", function (d) {
@@ -220,7 +220,7 @@ var budget = (function (module) {
                 });
 
             // UPDATE
-            circles
+            nodes
                 .transition().duration(1000)
                 .attr('cx', function(d) { return d.x })
                 .attr('cy', function(d) { return d.y })
@@ -231,7 +231,7 @@ var budget = (function (module) {
                 });
 
             // EXIT
-            circles.exit()
+            nodes.exit()
                 .transition().duration(1000)
                 .attr('r', 0)
                 .remove();
@@ -243,7 +243,7 @@ var budget = (function (module) {
 
         };
 
-        my.renderAsPlot = function(circles) {
+        my.renderAsPlot = function(nodes) {
 
             // stop the force layout simulation to prevent it from conflicting with plot layout.
             if (force) {
@@ -258,7 +258,7 @@ var budget = (function (module) {
             drawPlotGroupLabels(groupValues);
 
             // ENTER
-            circles.enter()
+            nodes.enter()
                 .append("circle")
                 .attr("class", "node")
                 .attr('cx', function(d) {
@@ -277,7 +277,7 @@ var budget = (function (module) {
                 });
 
             // UPDATE
-            circles
+            nodes
                 .transition().duration(2000)
                 .attr('cx', function(d) {
                     return plotXScale(d[model.group]);
@@ -292,7 +292,7 @@ var budget = (function (module) {
                 .style('fill', model.getColor);
 
             // EXIT
-            circles.exit()
+            nodes.exit()
                 .transition().duration(1000)
                 .attr('r', 0)
                 .remove();
@@ -352,7 +352,7 @@ var budget = (function (module) {
         };
 
         /** updates a timestep of the physics layout animation */
-        var tick = function(centers, group, circles) {
+        var tick = function(centers, group, nodes) {
             var focis = {};
             for (var i = 0; i < centers.length; i++) {
                 focis[centers[i].name] = centers[i];
@@ -365,7 +365,7 @@ var budget = (function (module) {
                     item.x += ((foci.x + (foci.dx / 2)) - item.x) * e.alpha;
                 }
                 if (e.alpha > 0) {
-                    circles
+                    nodes
                         .each(collide(0.22))// was .11 originally
                         .attr("cx", function (d) { return d.x; })
                         .attr("cy", function (d) { return d.y; });

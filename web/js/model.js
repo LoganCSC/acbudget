@@ -58,7 +58,7 @@ var budget = (function (module) {
                 d.x = Math.random() * my.width;
                 d.y = Math.random() * my.height;
                 var approvedAmt = +d["Approved Amount"];
-                d.type = approvedAmt > 0 ? "source" : "destination";
+                d.type = approvedAmt > 0 ? "source" : "target";
                 d["Approved Amount"] = +d["Approved Amount"];
                 d["Recommended Amount"] = +d["Recommended Amount"];
                 d.approvedToRecommendedRatio = d["Approved Amount"] / d["Recommended Amount"];
@@ -148,7 +148,7 @@ var budget = (function (module) {
                 return changeFillColor(row[my.colorAttr]);
             }
             else {
-                return my.colorAttr ? (row.type == "destination" ? TRANSFER_COLOR : my.getColors()(row[my.colorAttr])) : DEFAULT_COLOR;
+                return my.colorAttr ? (row.type == "target" ? TRANSFER_COLOR : my.getColors()(row[my.colorAttr])) : DEFAULT_COLOR;
             }
         };
 
